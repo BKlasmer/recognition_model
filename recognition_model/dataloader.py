@@ -11,10 +11,15 @@ and creating image pairs and labels for the siamese network.
 """
 
 class DataLoader(object):
-    def __init__(self, root: str, logger_level: str = "INFO") -> None:
+    def __init__(self, root: str, random_seed: int = 42, logger_level: str = "INFO") -> None:
+        self._root = root
         self._logger = Logging().create_logger(logger_name="Data Loader", logger_level=logger_level)
         self._logger.info("Initialising Data Loader")
-        self._root = root
+        self._logger.info(f"Setting random seed to: {random_seed}")
+        self.train_set, self.test_set = self.create_train_test_split()
+
+        random.seed(random_seed)
+        
 
     def _get_player_paths(self) -> dict:
         paths_per_player = {}
@@ -48,6 +53,31 @@ class DataLoader(object):
                 test_set[team].append(player_images[:n_test_images])
 
         return train_set, test_set
+
+    def generate_team_image_pairs_and_labels(self, dataset: dict) -> Tuple[str, str, int]:
+        while True:
+            # Pick a random team and player
+            team_1 = self.random_team(dataset)
+            image_1 = self.random_player(dataset, team_1)
+
+            # Generate a different random team
+            team_2 = self.random_team(dataset)
+            while team_1 == team_2:
+                team_2 = self.random_team(dataset)
+
+            # Radomly choose between another player from the same team, or a player from different team
+            image_2, label = random.choice([(self.random_player(dataset, team_1), 1), (self.random_player(dataset, team_2), 0)])
+
+            yield image_1, image_2, label
+
+    @staticmethod
+    def random_team(dataset: dict) -> str:
+        return random.choice(list(dataset.keys()))
+
+    @staticmethod
+    def random_player(dataset: dict, team: str) -> str:
+        return random.choice(random.choice(dataset[team]))
+
 
     
 

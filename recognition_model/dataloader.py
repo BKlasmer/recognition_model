@@ -14,9 +14,19 @@ class DataLoader(object):
         self._logger.info("Initialising Data Loader")
         self._root = root
 
-        paths_per_person = []
-        for team_dir in filter(Path.is_dir, Path(root).iterdir()):
+    def get_player_paths(self) -> dict:
+        paths_per_player = {}
+        for team_dir in filter(Path.is_dir, Path(self._root).iterdir()):
+            team_name = str(team_dir).split('/')[-1]
             for player_dir in filter(Path.is_dir, team_dir.iterdir()):
-                paths_per_person.append(list(map(str, player_dir.glob("*.jpg"))))
 
-        self.paths_per_person = [paths for paths in paths_per_person if len(paths) > 1]
+                player_path = list(map(str, player_dir.glob("*.jpg")))
+
+                if team_name in paths_per_player:
+                    paths_per_player[team_name].append(player_path)
+                else:
+                    paths_per_player[team_name] = player_path
+
+        return paths_per_player
+
+    

@@ -13,7 +13,7 @@ def test_get_player_paths():
 
     # Exercise
     dataloader = DataLoader(root="data/unit_test")
-    actual = dataloader.get_player_paths()
+    actual = dataloader._get_player_paths()
 
     # Verify
     assert actual == desired

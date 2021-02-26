@@ -2,6 +2,7 @@
 # -*- coding: latin-1 -*-
 
 from pathlib import Path
+from typing import Tuple
 from recognition_model.utils import Logging
 
 """Data loader class to handle the data. Functionality includes splitting the data into train and test sets
@@ -25,8 +26,13 @@ class DataLoader(object):
                 if team_name in paths_per_player:
                     paths_per_player[team_name].append(player_path)
                 else:
-                    paths_per_player[team_name] = player_path
+                    paths_per_player[team_name] = [player_path]
 
         return paths_per_player
+
+    def create_train_test_split(self, test_size: float = 0.2) -> Tuple[dict, dict]:
+
+        paths_per_player = self.get_player_paths()
+
 
     

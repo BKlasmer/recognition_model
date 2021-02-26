@@ -9,7 +9,7 @@ from recognition_model import DataLoader
 
 def test_get_player_paths():
     # Setup
-    desired = {"team_github": ["data/unit_test/team_github/person_0/github_logo.jpg"]}
+    desired = {"team_github": [["data/unit_test/team_github/person_0/github_logo.jpg"]]}
 
     # Exercise
     dataloader = DataLoader(root="data/unit_test")

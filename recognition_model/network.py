@@ -2,6 +2,7 @@
 # -*- coding: latin-1 -*-
 
 import random
+import torch
 import torch.nn as nn
 from typing import Tuple
 from recognition_model.utils import Logging
@@ -43,8 +44,8 @@ class SiameseNetwork(nn.Module):
 
     def forward(self, input1, input2):
         # Forward Pass
-        vector1 = self.convnet(image1)
-        vector2 = self.convnet(image2)
+        vector1 = self.convnet(input1)
+        vector2 = self.convnet(input2)
         vector1 = vector1.view(vector1.size()[0], -1)
         vector2 = vector2.view(vector2.size()[0], -1)
         combined_vector = torch.cat((vector1, vector2), 0)

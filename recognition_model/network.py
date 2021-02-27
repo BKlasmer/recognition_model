@@ -18,3 +18,28 @@ class SiameseNetwork(nn.Module):
         self._logger.info(f"Setting random seed to: {random_seed}")
 
         random.seed(random_seed)
+
+        self.convnet = nn.Sequential(
+
+            nn.Conv2d(3, 8, kernel_size=3, stride=1), nn.ReLU(),
+            nn.Conv2d(8, 8, kernel_size=3, stride=1), nn.ReLU(),
+            nn.AvgPool2d(2, stride=2),
+            nn.Conv2d(8, 16, kernel_size=3, stride=1), nn.ReLU(),
+            nn.Conv2d(16, 16, kernel_size=3, stride=1), nn.ReLU(),
+            nn.AvgPool2d(2, stride=2),
+            nn.Conv2d(16, 32, kernel_size=3, stride=1), nn.ReLU(),
+            nn.Conv2d(32, 32, kernel_size=3, stride=1), nn.ReLU(),
+            nn.AvgPool2d(2, stride=2),
+            nn.Conv2d(32, 32, kernel_size=3, stride=1), nn.ReLU(),
+            nn.Conv2d(32, 32, kernel_size=3, stride=1), nn.ReLU(),
+            nn.AvgPool2d(2, stride=2),
+        
+        )
+
+        self.fully_connected = nn.Sequential(
+
+            nn.Linear(32 * 10 * 10, 32), nn.ReLU(),
+            nn.Linear(32, 32), nn.ReLU(),
+            nn.Linear(32, 2)
+
+        )

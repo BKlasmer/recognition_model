@@ -1,1 +1,2 @@
 from recognition_model.dataloader import DataLoader
+from recognition_model.network import SiameseNetwork

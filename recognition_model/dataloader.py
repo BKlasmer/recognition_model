@@ -10,6 +10,7 @@ from recognition_model.utils import Logging
 and creating image pairs and labels for the siamese network.
 """
 
+
 class DataLoader(object):
     def __init__(self, root: str, random_seed: int = 42, logger_level: str = "INFO") -> None:
         self._root = root
@@ -19,12 +20,19 @@ class DataLoader(object):
         self.train_set, self.test_set = self.create_train_test_split()
 
         random.seed(random_seed)
-        
 
     def _get_player_paths(self) -> dict:
+        """Iterates through the directory of images and returns a dictionary of team names as keys and
+        a list of paths to player images as values.
+
+        E.g. {"team": [[player1 paths], [player2 paths], ...]}
+
+        Returns:
+            dict: Dictionary of teams and image paths of their players
+        """
         paths_per_player = {}
         for team_dir in filter(Path.is_dir, Path(self._root).iterdir()):
-            team_name = str(team_dir).split('/')[-1] # Get team name from path
+            team_name = str(team_dir).split("/")[-1]  # Get team name from path
             for player_dir in filter(Path.is_dir, team_dir.iterdir()):
                 # Get all paths to images for that player
                 player_path = list(map(str, player_dir.glob("*.jpg")))
@@ -37,13 +45,20 @@ class DataLoader(object):
         return paths_per_player
 
     def create_train_test_split(self, test_size: float = 0.2) -> Tuple[dict, dict]:
+        """Creates train and test splits
 
+        Args:
+            test_size (float, optional): Percentage size of test class. Defaults to 0.2.
+
+        Returns:
+            Tuple[dict, dict]: Train and test dictionaries in the format _get_players_paths generates
+        """
         paths_per_player = self._get_player_paths()
         train_set, test_set = {}, {}
         # Iterate over all teams and paths to player images
         for team, all_player_paths in paths_per_player.items():
             train_set[team], test_set[team] = [], []
-            
+
             for player_images in all_player_paths:
                 # Calculate how many images in test set for the player
                 n_test_images = int(len(player_images) * test_size)
@@ -55,6 +70,14 @@ class DataLoader(object):
         return train_set, test_set
 
     def generate_team_image_pairs_and_labels(self, dataset: dict) -> Tuple[str, str, int]:
+        """Generator object that returns pairs of paths to images and their corresponding label
+
+        Args:
+            dataset (dict): Train or test dictionary in the format _get_players_paths provides
+
+        Yields:
+            Iterator[Tuple[str, str, int]]: player 1 image path, player 2 image path, label
+        """
         while True:
             # Pick a random team and player
             team_1 = self.random_team(dataset)
@@ -77,9 +100,3 @@ class DataLoader(object):
     @staticmethod
     def random_player(dataset: dict, team: str) -> str:
         return random.choice(random.choice(dataset[team]))
-
-
-    
-
-
-    

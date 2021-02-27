@@ -7,6 +7,7 @@ from recognition_model import DataLoader
 """ Example boilerplate file
 """
 
+
 def test_get_player_paths():
     # Setup
     desired = {"team_github": [["data/unit_test/team_github/person_0/github_logo.jpg"]]}

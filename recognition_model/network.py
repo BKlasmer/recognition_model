@@ -11,13 +11,10 @@ from recognition_model.utils import Logging
 
 
 class SiameseNetwork(nn.Module):
-    def __init__(self, random_seed: int = 42, logger_level: str = "INFO") -> None:
+    def __init__(self, logger_level: str = "INFO") -> None:
         super(SiameseNetwork, self).__init__()
         self._logger = Logging().create_logger(logger_name="Siamese Network", logger_level=logger_level)
         self._logger.info("Initialising Siamese Network")
-        self._logger.info(f"Setting random seed to: {random_seed}")
-
-        random.seed(random_seed)
 
         self.convnet = nn.Sequential(
 
@@ -38,8 +35,18 @@ class SiameseNetwork(nn.Module):
 
         self.fully_connected = nn.Sequential(
 
-            nn.Linear(32 * 10 * 10, 32), nn.ReLU(),
+            nn.Linear(2 * 32 * 10 * 10, 32), nn.ReLU(),
             nn.Linear(32, 32), nn.ReLU(),
             nn.Linear(32, 2)
 
         )
+
+    def forward(self, input1, input2):
+        # Forward Pass
+        vector1 = self.convnet(image1)
+        vector2 = self.convnet(image2)
+        vector1 = vector1.view(vector1.size()[0], -1)
+        vector2 = vector2.view(vector2.size()[0], -1)
+        combined_vector = torch.cat((vector1, vector2), 0)
+        logits = self.fully_connected(combined_vector)
+        return logits

@@ -101,7 +101,7 @@ class DataLoader(IterableDataset):
             yield self.decode_image(image_1), self.decode_image(image_2), label
 
     def decode_image(self, image_path):
-        return self.transforms(Image.open(image_path))
+        return self.transforms(Image.open(image_path))[:, 50:100, 90:125] # Crop the player, [C, H, W]
 
     @staticmethod
     def random_team(dataset: dict) -> str:

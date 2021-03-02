@@ -1,3 +1,4 @@
 from recognition_model.dataloader import DataLoader
 from recognition_model.network import SiameseNetwork
 from recognition_model.trainer import Trainer
+from recognition_mode.evaluation import Evaluation

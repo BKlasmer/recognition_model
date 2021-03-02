@@ -16,8 +16,7 @@ class Evaluation(object):
         self._logger = Logging().create_logger(logger_name="Evaluation", logger_level=logger_level)
         self._logger.info("Initialising Evaluation")
 
-    def calculate_auc(self, model, test_loader):
-
+    def calculate_logits(self, model, test_loader):
         loader = TorchLoader(test_loader, batch_size=250)
 
         for batch in loader:
@@ -28,7 +27,14 @@ class Evaluation(object):
         predicted_scores = predicted_scores.detach().numpy()
         labels = labels.numpy()
 
+        return predicted_scores, labels
+
+    @staticmethod
+    def calculate_auc(self, predicted_scores, labels):
+
         fpr, tpr, thresholds = roc_curve(labels, predicted_scores)
         roc_auc = auc(fpr, tpr)
 
         return roc_auc, fpr, tpr, thresholds
+
+

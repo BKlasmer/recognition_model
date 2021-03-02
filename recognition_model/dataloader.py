@@ -14,7 +14,7 @@ and creating image pairs and labels for the siamese network.
 """
 
 
-class DataLoader(IterableDataset):
+class DataLoader(object):
     def __init__(self, root: str, random_seed: int = 42, logger_level: str = "INFO") -> None:
         self._root = root
         self._logger = Logging().create_logger(logger_name="Data Loader", logger_level=logger_level)
@@ -24,9 +24,6 @@ class DataLoader(IterableDataset):
         self.transforms = transforms.Compose([transforms.ToTensor()])
 
         random.seed(random_seed)
-
-    def __iter__(self):
-        return iter(self.generate_team_image_pairs_and_labels(self.train_set))
 
     def _get_player_paths(self) -> dict:
         """Iterates through the directory of images and returns a dictionary of team names as keys and
@@ -67,6 +64,9 @@ class DataLoader(IterableDataset):
             train_set[team], test_set[team] = [], []
 
             for player_images in all_player_paths:
+                # Only take players with more than 10 images
+                if len(player_images) < 10:
+                    continue
                 # Calculate how many images in test set for the player
                 n_test_images = int(len(player_images) * test_size)
                 # Shuffle paths and split by the test size
@@ -110,3 +110,11 @@ class DataLoader(IterableDataset):
     @staticmethod
     def random_player(dataset: dict, team: str) -> str:
         return random.choice(random.choice(dataset[team]))
+
+
+class DataForTrainer(IterableDataset):
+    def __init__(self, data_generator):
+        self.data_generator = data_generator
+
+    def __iter__(self):
+        return iter(self.data_generator)

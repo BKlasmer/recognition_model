@@ -19,26 +19,18 @@ class SiameseNetwork(nn.Module):
 
         self.convnet = nn.Sequential(
 
-            nn.Conv2d(3, 8, kernel_size=3, stride=1), nn.ReLU(),
+            nn.Conv2d(3, 8, kernel_size=5, stride=1), nn.ReLU(),
             nn.Conv2d(8, 8, kernel_size=3, stride=1), nn.ReLU(),
-            nn.AvgPool2d(2, stride=2),
-            nn.Conv2d(8, 16, kernel_size=3, stride=1), nn.ReLU(),
-            nn.Conv2d(16, 16, kernel_size=3, stride=1), nn.ReLU(),
-            nn.AvgPool2d(2, stride=2),
-            nn.Conv2d(16, 32, kernel_size=3, stride=1), nn.ReLU(),
-            nn.Conv2d(32, 32, kernel_size=3, stride=1), nn.ReLU(),
-            nn.AvgPool2d(2, stride=2),
-            nn.Conv2d(32, 32, kernel_size=3, stride=1), nn.ReLU(),
-            nn.Conv2d(32, 32, kernel_size=3, stride=1), nn.ReLU(),
-            nn.AvgPool2d(2, stride=2),
+            nn.MaxPool2d(2, stride=2),
         
         )
 
+        self.convnet.apply(self.initialise_weights)
+        
+
         self.fully_connected = nn.Sequential(
 
-            nn.Linear(2 * 32 * 10 * 10, 32), nn.ReLU(),
-            nn.Linear(32, 32), nn.ReLU(),
-            nn.Linear(32, 2)
+            nn.Linear(4928, 1), nn.Sigmoid(),
 
         )
 
@@ -48,6 +40,12 @@ class SiameseNetwork(nn.Module):
         vector2 = self.convnet(input2)
         vector1 = vector1.view(vector1.size()[0], -1)
         vector2 = vector2.view(vector2.size()[0], -1)
-        combined_vector = torch.cat((vector1, vector2), 0)
+        combined_vector = torch.cat((vector1, vector2), 1)
         logits = self.fully_connected(combined_vector)
         return logits
+
+    @staticmethod
+    def initialise_weights(model):
+        if type(model) == nn.Conv2d:
+            nn.init.xavier_uniform_(model.weight)
+            model.bias.data.fill_(0.01)
